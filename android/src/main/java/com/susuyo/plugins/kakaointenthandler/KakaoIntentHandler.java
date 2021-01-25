@@ -56,6 +56,10 @@ public class KakaoIntentHandler extends Plugin {
                 Log.e(TAG, "Invalid intent request", e);
                 return false;
             }
+        } else if (url.getScheme().equals("capacitor")) {
+            // capacitor://app.moranique.com
+            bridge.getWebView().loadUrl(url.toString().replace("capacitor:", "https:"));
+            return true;
         } else {
             return false;
         }
