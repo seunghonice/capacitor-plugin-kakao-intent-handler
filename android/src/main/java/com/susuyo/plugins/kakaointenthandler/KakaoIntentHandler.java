@@ -12,7 +12,7 @@ import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import java.net.URISyntaxException;
 
-@NativePlugin
+@CapacitorPlugin
 public class KakaoIntentHandler extends Plugin {
 
     static String TAG = "kakaointenthandler";
