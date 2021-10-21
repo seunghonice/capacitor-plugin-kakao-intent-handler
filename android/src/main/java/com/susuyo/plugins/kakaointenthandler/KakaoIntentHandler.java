@@ -1,15 +1,14 @@
 package com.susuyo.plugins.kakaointenthandler;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
-import android.content.Intent;
-
 import com.getcapacitor.JSObject;
-import com.getcapacitor.CapacitorPlugin;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
+import com.getcapacitor.annotation.CapacitorPlugin;
 import java.net.URISyntaxException;
 
 @CapacitorPlugin
@@ -51,7 +50,6 @@ public class KakaoIntentHandler extends Plugin {
 
                 Log.e(TAG, "Could not parse anythings");
                 return false;
-
             } catch (URISyntaxException e) {
                 Log.e(TAG, "Invalid intent request", e);
                 return false;
