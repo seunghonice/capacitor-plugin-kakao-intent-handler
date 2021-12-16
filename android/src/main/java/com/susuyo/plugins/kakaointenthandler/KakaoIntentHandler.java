@@ -64,4 +64,85 @@ public class KakaoIntentHandler extends Plugin {
             return false;
         }
     }
+
+    @Override
+    public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
+        WebView childWebVeiw = new WebView(this);
+        WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
+        transport.setWebView(newWebView);
+        resultMsg.sendToTarget();
+
+        newWebView.setWebViewClient(
+            new WebViewClient() {
+                @Override
+                public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW);
+                    browserIntent.setData(Uri.parse(url));
+                    startActivity(browserIntent);
+                    return true;
+                }
+            }
+        );
+
+        return true;
+    }
+
+    @Override
+    public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
+        MyLog.toastMakeTextShow(view.getContext(), "TAG", "window.open 협의가 필요합니다.");
+        WebView newWebView = new WebView(view.getContext());
+        WebSettings webSettings = newWebView.getSettings();
+        WebSettings settings = newWebView.getSettings();
+        settings.setJavaScriptEnabled(true);
+        settings.setJavaScriptCanOpenWindowsAutomatically(true);
+        settings.setSupportMultipleWindows(true);
+
+        //final Dialog dialog = new Dialog(view.getContext(),R.style.Theme_DialogFullScreen);
+        final Dialog dialog = new Dialog(view.getContext());
+        dialog.setContentView(newWebView);
+        dialog.show();
+
+        dialog.setOnKeyListener(
+            new DialogInterface.OnKeyListener() {
+                @Override
+                public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+                    if (keyCode == KeyEvent.KEYCODE_BACK) {
+                        //MyLog.toastMakeTextShow(view.getContext(), "TAG", "KEYCODE_BACK");
+                        if (newWebView.canGoBack()) {
+                            newWebView.goBack();
+                        } else {
+                            MyLog.toastMakeTextShow(view.getContext(), "TAG", "Window.open 종료");
+                            dialog.dismiss();
+                        }
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+            }
+        );
+        newWebView.setWebViewClient(new MyWebViewClient(view.getContext()));
+        newWebView.setWebChromeClient(
+            new MyWebChromeClient() {
+                @Override
+                public void onCloseWindow(WebView window) {
+                    dialog.dismiss();
+                }
+            }
+        );
+
+        WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
+        transport.setWebView(newWebView);
+        resultMsg.sendToTarget();
+        return true;
+    }
+
+    @Override
+    public void onCloseWindow(WebView window) {
+        MyLog.i(getClass().getName(), "onCloseWindow");
+        window.setVisibility(View.GONE);
+        window.destroy();
+        //mWebViewSub=null;
+        super.onCloseWindow(window);
+    }
 }
