@@ -21,7 +21,7 @@ import java.net.URISyntaxException;
 
 @NativePlugin
 public class KakaoIntentHandler extends Plugin {
-
+    private WebView webView;
     static String TAG = "kakaointenthandler";
 
     @PluginMethod
@@ -34,12 +34,15 @@ public class KakaoIntentHandler extends Plugin {
     }
 
     @PluginMethod
-    public Boolean shouldOverrideLoad(Uri url) {
-        if (url.getScheme().equals("intent")) {
-            try {
-                bridge.getWebView().setWebChromeClient(new WebChromeClient(){
+    public void load(){
+        Log.d("Called0", "onCreateWindow Called======================");
+        this.getBridge().getWebView().setWebChromeClient(
+                new WebChromeClient() {
                     @Override
                     public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
+
+                        Log.d("Called", "onCreateWindow Called======================");
+
                         WebView newWebView = new WebView(view.getContext());
                         WebSettings settings = newWebView.getSettings();
                         settings.setJavaScriptEnabled(true);
@@ -47,12 +50,12 @@ public class KakaoIntentHandler extends Plugin {
                         settings.setSupportMultipleWindows(true);
                         newWebView.setWebChromeClient(this);
                         newWebView.setWebViewClient(new WebViewClient());
-                        bridge.getWebView().addView(newWebView);
 
                         newWebView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
                         WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
                         transport.setWebView(newWebView);
                         resultMsg.sendToTarget();
+                        view.addView(newWebView);
                         return true;
                     }
                     @Override
@@ -60,10 +63,16 @@ public class KakaoIntentHandler extends Plugin {
                         super.onCloseWindow(window);
                         bridge.getWebView().removeView(window);
                     }
-                }
 
+                });
 
-                );
+    }
+
+    @PluginMethod
+    public Boolean shouldOverrideLoad(Uri url) {
+        if (url.getScheme().equals("intent")) {
+            try {
+
                 // Intent 생성
                 Intent intent = Intent.parseUri(url.toString(), Intent.URI_INTENT_SCHEME);
 
